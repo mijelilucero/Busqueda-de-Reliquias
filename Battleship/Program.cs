@@ -36,7 +36,7 @@ static char[,] inicializarTablero(int tamanioTablero)
     {
         for (int j = 0; j < tamanioTablero; j++)
         {
-            tablero[i, j] = 'O';
+            tablero[i, j] = '~';
         }
     }
 
