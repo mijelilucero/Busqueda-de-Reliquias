@@ -1,4 +1,6 @@
-﻿static char[,] inicializarTablero(int tamanioTablero)
+﻿using System.Data;
+
+static char[,] inicializarTablero(int tamanioTablero)
 {
     char[,] tablero = new char[tamanioTablero, tamanioTablero];
     
@@ -73,7 +75,7 @@ static void colocarReliquia(char[,]tableroOculto, string reliquia, int tamanioRe
 {
     for (int i = 0; i < tamanioReliquia; i++)
     {
-        if (orientacion == 0) //horizontal
+        if (orientacion == 0) 
         {
             tableroOculto[fila, columna + i] = reliquia[i];
         }
@@ -82,6 +84,130 @@ static void colocarReliquia(char[,]tableroOculto, string reliquia, int tamanioRe
             tableroOculto[fila + i, columna] = reliquia[i];
         }
     }
+}
+
+
+static void mostrarTablero(char[,] tableroVisible, int tamanioTablero)
+{
+    Console.Write("    ");
+    for (int i = 0; i < tamanioTablero; i++)
+    {
+        Console.Write($"{i} ");
+    }
+    Console.WriteLine();
+
+    Console.WriteLine("   " + new string('-', tamanioTablero * 2 + 1));
+    
+    for (int i = 0; i < tamanioTablero; i++)
+    {
+        char letraFila = (char)('A' + i);
+        Console.Write($"{letraFila}  ");
+        for (int j = 0; j < tamanioTablero; j++)
+        {
+            Console.Write($"|{tableroVisible[i, j]}");
+        }
+        Console.WriteLine("|");
+    }
+
+    Console.WriteLine("   " + new string('-', tamanioTablero * 2 + 1));
+}
+
+
+static bool validarCoordenada(string coordenada)
+{
+    if (coordenada.Length != 2)
+    {
+        return false;
+    }
+
+    char fila = char.ToUpper(coordenada[0]);
+
+    if (fila < 'A' || fila > 'J')
+    {
+        return false;
+    }
+
+    int columna = int.Parse(coordenada.Substring(1));
+
+    if (columna < 0 || columna > 9)
+    {
+        return false;
+    }
+
+
+    return true;
+}
+
+
+static void marcarTableroVisible(char fila, int columna, char[,] tableroOculto, char[,] tableroVisible)
+{
+    int indiceFila, indiceColumna;
+
+    indiceFila = convertirFila(fila);
+    indiceColumna = columna;
+
+    if (tableroOculto[indiceFila, indiceColumna] == '~')
+    {
+        tableroVisible[indiceFila, indiceColumna] = 'x';
+    }
+    else
+    {
+        tableroVisible[indiceFila, indiceColumna] = tableroOculto[indiceFila, indiceColumna];
+    }
+}
+
+
+static int convertirFila(char fila)
+{
+    int indiceFila = 0;
+
+    switch (fila)
+    {
+        case 'A':
+            indiceFila = 0;
+            break;
+
+        case 'B':
+            indiceFila = 1;
+            break;
+
+        case 'C':
+            indiceFila = 2;
+            break;
+
+        case 'D':
+            indiceFila = 3;
+            break;
+
+        case 'E':
+            indiceFila = 4;
+            break;
+
+        case 'F':
+            indiceFila = 5;
+            break;
+
+        case 'G':
+            indiceFila = 6;
+            break;
+
+        case 'H':
+            indiceFila = 7;
+            break;
+
+        case 'I':
+            indiceFila = 8;
+            break;
+
+        case 'J':
+            indiceFila = 9;
+            break;
+
+        default:
+            break;
+    }
+
+    return indiceFila;
 }
 
 
@@ -97,6 +223,42 @@ char[,] tableroOculto = inicializarTablero(tamanioTablero);
 char[,] tableroVisible = inicializarTablero(tamanioTablero);
 
 posicionarReliquias(tableroOculto, reliquias, tamanioTablero);
+
+
+    bool juegoTerminado = false;
+    int intentos = 0;
+
+    while (!juegoTerminado)
+    {
+        mostrarTablero(tableroVisible, tamanioTablero);
+
+        Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
+        string coordenada = Console.ReadLine();
+
+        if (validarCoordenada(coordenada) == true)
+        {
+            char fila = char.ToUpper(coordenada[0]);
+        int columna = int.Parse(coordenada.Substring(1));
+
+        marcarTableroVisible(fila, columna, tableroOculto, tableroVisible);
+
+        intentos++;
+
+        if (intentos == 30)
+        {
+            juegoTerminado = true;
+            Console.WriteLine("¡Has encontrado todas las reliquias! ¡Felicidades!");
+        }
+    }
+        else
+        {
+            Console.WriteLine("Coordenada inválida. Inténtelo de nuevo.");
+        }
+    }
+
+
+
+
 
 
 
