@@ -211,8 +211,6 @@ static int convertirFila(char fila)
 }
 
 
-
-
 //PROGRAMA PRINCIPAL
 
 int tamanioTablero = 10;
@@ -224,25 +222,39 @@ char[,] tableroVisible = inicializarTablero(tamanioTablero);
 
 posicionarReliquias(tableroOculto, reliquias, tamanioTablero);
 
+bool juegoTerminado = false;
+int intentos = 0;
+bool[,] tirosRealizados=new bool[tamanioTablero,tamanioTablero];    
 
-    bool juegoTerminado = false;
-    int intentos = 0;
+while (!juegoTerminado)
+{
+    mostrarTablero(tableroVisible, tamanioTablero);
 
-    while (!juegoTerminado)
+    Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
+    string coordenada = Console.ReadLine();
+
+    if (validarCoordenada(coordenada) == true)
     {
-        mostrarTablero(tableroVisible, tamanioTablero);
-
-        Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
-        string coordenada = Console.ReadLine();
-
-        if (validarCoordenada(coordenada) == true)
-        {
-            char fila = char.ToUpper(coordenada[0]);
+        char fila = char.ToUpper(coordenada[0]);
         int columna = int.Parse(coordenada.Substring(1));
 
+        if (tirosRealizados[convertirFila(fila), columna] == true)
+        {
+            Console.WriteLine("Coordenada ya utilizada intente de nuevo.");
+            continue;
+        }
+
+        tirosRealizados[convertirFila(fila), columna] = true;        
         marcarTableroVisible(fila, columna, tableroOculto, tableroVisible);
 
         intentos++;
+
+
+
+
+
+
+
 
         if (intentos == 30)
         {
@@ -250,11 +262,11 @@ posicionarReliquias(tableroOculto, reliquias, tamanioTablero);
             Console.WriteLine("¡Has encontrado todas las reliquias! ¡Felicidades!");
         }
     }
-        else
-        {
-            Console.WriteLine("Coordenada inválida. Inténtelo de nuevo.");
-        }
+    else
+    {
+        Console.WriteLine("Coordenada inválida. Inténtelo de nuevo.");
     }
+}
 
 
 
