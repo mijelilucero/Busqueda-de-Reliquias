@@ -269,55 +269,63 @@ static int puntajePorReliquia(string reliquia)
 }
 
 
-static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, string[] reliquias, bool[] reliquiasEncontradas, ref int puntaje, ref bool nuevaReliquiaEncontrada)
+static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, string[] reliquias, bool[] reliquiasEncontradas, ref int puntaje, ref bool nuevaReliquiaEncontrada, ref string ultimaReliquiaEncontrada)
 {
     if (!reliquiasEncontradas[0] && conteoReliquiasEncontradas[0] == 1) //S
     {
         reliquiasEncontradas[0] = true;
         puntaje += puntajePorReliquia(reliquias[0]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "AMULETO DEL SOL";
     }
     else if (!reliquiasEncontradas[1] && conteoReliquiasEncontradas[1] == 1) //F
     {
         reliquiasEncontradas[1] = true;
         puntaje += puntajePorReliquia(reliquias[1]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "SELLO DEL FARAÓN";
     }
     else if (!reliquiasEncontradas[2] && conteoReliquiasEncontradas[2] == 2) //ZZ
     {
         reliquiasEncontradas[2] = true;
         puntaje += puntajePorReliquia(reliquias[2]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "BRAZALETE DE SERPIENTES";
     }
     else if (!reliquiasEncontradas[3] && conteoReliquiasEncontradas[3] == 2) //MM
     {
         reliquiasEncontradas[3] = true;
         puntaje += puntajePorReliquia(reliquias[3]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "MÁSCARA CEREMONIAL";
     }
     else if (!reliquiasEncontradas[4] && conteoReliquiasEncontradas[4] == 3) //EEE
     {
         reliquiasEncontradas[4] = true;
         puntaje += puntajePorReliquia(reliquias[4]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "COFRE DE ESMERALDAS";
     }
     else if (!reliquiasEncontradas[5] && conteoReliquiasEncontradas[5] == 3) //PPP
     {
         reliquiasEncontradas[5] = true;
         puntaje += puntajePorReliquia(reliquias[5]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "ESPADA DE OBSIADIANA";
     }
     else if (!reliquiasEncontradas[6] && conteoReliquiasEncontradas[6] == 4) //RRRR
     {
         reliquiasEncontradas[6] = true;
         puntaje += puntajePorReliquia(reliquias[6]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "CETRO DE LOS REYES";
     }
     else if (!reliquiasEncontradas[7] && conteoReliquiasEncontradas[7] == 5) //BBBBB
     {
         reliquiasEncontradas[7] = true;
         puntaje += puntajePorReliquia(reliquias[7]);
         nuevaReliquiaEncontrada = true;
+        ultimaReliquiaEncontrada = "BÁCULO DE LOS SABIOS";
     }
 }
 
@@ -396,18 +404,11 @@ while (!juegoTerminado)
 
         intentos++;
 
-        marcarReliquiaComoEncontrada(conteoReliquiasEncontradas, reliquias, reliquiasEncontradas, ref puntaje, ref nuevaReliquiaEncontrada);
+        marcarReliquiaComoEncontrada(conteoReliquiasEncontradas, reliquias, reliquiasEncontradas, ref puntaje, ref nuevaReliquiaEncontrada, ref ultimaReliquiaEncontrada);
 
         if (nuevaReliquiaEncontrada)
         {
-            for (int i = 0; i < reliquias.Length; i++)
-            {
-                if (reliquiasEncontradas[i] == true)
-                {
-                    Console.WriteLine($"¡Has encontrado la reliquia {reliquias[i]} completa!");
-                }
-            }
-
+            Console.WriteLine($"¡Has encontrado la reliquia {ultimaReliquiaEncontrada} completa!");
             nuevaReliquiaEncontrada = false;
         }
 
