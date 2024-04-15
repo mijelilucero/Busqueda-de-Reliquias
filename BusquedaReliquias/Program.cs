@@ -1,6 +1,4 @@
-﻿using System.Data;
-
-static char[,] inicializarTablero(int tamanioTablero)
+﻿static char[,] inicializarTablero(int tamanioTablero)
 {
     char[,] tablero = new char[tamanioTablero, tamanioTablero];
     
@@ -139,24 +137,6 @@ static bool validarCoordenada(string coordenada)
 }
 
 
-static void marcarTableroVisible(char fila, int columna, char[,] tableroOculto, char[,] tableroVisible)
-{
-    int indiceFila, indiceColumna;
-
-    indiceFila = convertirFila(fila);
-    indiceColumna = columna;
-
-    if (tableroOculto[indiceFila, indiceColumna] == '~')
-    {
-        tableroVisible[indiceFila, indiceColumna] = 'x';
-    }
-    else
-    {
-        tableroVisible[indiceFila, indiceColumna] = tableroOculto[indiceFila, indiceColumna];
-    }
-}
-
-
 static int convertirFila(char fila)
 {
     int indiceFila = 0;
@@ -211,11 +191,115 @@ static int convertirFila(char fila)
 }
 
 
+static void marcarTableroVisible(char fila, int columna, char[,] tableroOculto, char[,] tableroVisible, int[] conteoReliquiasEncontradas)
+{
+    int indiceFila, indiceColumna;
+
+    indiceFila = convertirFila(fila);
+    indiceColumna = columna;
+
+    if (tableroOculto[indiceFila, indiceColumna] == '~')
+    {
+        tableroVisible[indiceFila, indiceColumna] = 'x';
+    }
+    else
+    {
+        tableroVisible[indiceFila, indiceColumna] = tableroOculto[indiceFila, indiceColumna];
+        acumularPartesDeReliquias(tableroOculto[indiceFila, indiceColumna], conteoReliquiasEncontradas);
+    }
+}
+
+
+static void acumularPartesDeReliquias(char simbolo, int[] conteoReliquiasEncontradas)
+{
+    switch (simbolo)
+    {
+        case 'S':
+            conteoReliquiasEncontradas[0]++;
+            break;
+
+        case 'F':
+            conteoReliquiasEncontradas[1]++;
+            break;
+
+        case 'Z':
+            conteoReliquiasEncontradas[2]++;
+            break;
+
+        case 'M':
+            conteoReliquiasEncontradas[3]++;
+            break;
+
+        case 'E':
+            conteoReliquiasEncontradas[4]++;
+            break;
+
+        case 'P':
+            conteoReliquiasEncontradas[5]++;
+            break;
+
+        case 'R':
+            conteoReliquiasEncontradas[6]++;
+            break;
+
+        case 'B':
+            conteoReliquiasEncontradas[7]++;
+            break;
+    }
+}
+
+
+static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, bool[] reliquiasEncontradas)
+{
+    if (conteoReliquiasEncontradas[0] == 1) //S
+    {
+        reliquiasEncontradas[0] = true;
+    }
+    else if (conteoReliquiasEncontradas[1] == 1) //F
+    {
+        reliquiasEncontradas[1] = true;
+    }
+    else if (conteoReliquiasEncontradas[2] == 2) //ZZ
+    {
+        reliquiasEncontradas[2] = true;
+    }
+    else if (conteoReliquiasEncontradas[3] == 2) //MM
+    {
+        reliquiasEncontradas[3] = true;
+    }
+    else if (conteoReliquiasEncontradas[4] == 3) //EEE
+    {
+        reliquiasEncontradas[4] = true;
+    }
+    else if (conteoReliquiasEncontradas[5] == 3) //PPP
+    {
+        reliquiasEncontradas[5] = true;
+    }
+    else if (conteoReliquiasEncontradas[6] == 4) //RRRR
+    {
+        reliquiasEncontradas[6] = true;
+    }
+    else if (conteoReliquiasEncontradas[7] == 5) //BBBBB
+    {
+        reliquiasEncontradas[7] = true;
+    }
+}
+
+
 //PROGRAMA PRINCIPAL
 
 int tamanioTablero = 10;
+int maxIntentos = 30;
 
 string[] reliquias = { "S", "F", "ZZ", "MM", "EEE", "PPP", "RRRR", "BBBBB" };
+
+int[] conteoReliquiasEncontradas = new int[reliquias.Length];
+bool[] reliquiasEncontradas=new bool[reliquias.Length];
+
+for (int i = 0; i < reliquias.Length; i++)
+{
+    conteoReliquiasEncontradas[i] = 0;
+}   
 
 char[,] tableroOculto = inicializarTablero(tamanioTablero);
 char[,] tableroVisible = inicializarTablero(tamanioTablero);
@@ -224,11 +308,28 @@ posicionarReliquias(tableroOculto, reliquias, tamanioTablero);
 
 bool juegoTerminado = false;
 int intentos = 0;
-bool[,] tirosRealizados=new bool[tamanioTablero,tamanioTablero];    
+int puntaje = 0;
+
+bool[,] coordenadasUtilizadas=new bool[tamanioTablero,tamanioTablero]; 
 
 while (!juegoTerminado)
 {
+    int intentosRestantes = maxIntentos - intentos;
+    Console.WriteLine($"\n\nTe quedan {intentosRestantes} intentos restantes.");
+    Console.WriteLine($"Llevas {puntaje} puntos.");
+
     mostrarTablero(tableroVisible, tamanioTablero);
+
+    Console.WriteLine("\n\nTablero oculto");
+    for (int i = 0; i < tamanioTablero; i++)
+    {
+        for (int j = 0; j < tamanioTablero; j++)
+        {
+            Console.Write("{0,3}", tableroOculto[i, j]);
+        }
+        Console.WriteLine();
+    }
+
 
     Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
     string coordenada = Console.ReadLine();
@@ -238,22 +339,26 @@ while (!juegoTerminado)
         char fila = char.ToUpper(coordenada[0]);
         int columna = int.Parse(coordenada.Substring(1));
 
-        if (tirosRealizados[convertirFila(fila), columna] == true)
+        if (coordenadasUtilizadas[convertirFila(fila), columna] == true)
         {
             Console.WriteLine("Coordenada ya utilizada intente de nuevo.");
             continue;
         }
 
-        tirosRealizados[convertirFila(fila), columna] = true;        
-        marcarTableroVisible(fila, columna, tableroOculto, tableroVisible);
+        coordenadasUtilizadas[convertirFila(fila), columna] = true;        
+        marcarTableroVisible(fila, columna, tableroOculto, tableroVisible, conteoReliquiasEncontradas);
 
         intentos++;
 
+        marcarReliquiaComoEncontrada(conteoReliquiasEncontradas, reliquiasEncontradas);
 
-
-
-
-
+        for (int i = 0; i < reliquias.Length; i++)
+        {
+            if (reliquiasEncontradas[i] == true)
+            {
+                Console.WriteLine($"¡Has encontrado la reliquia {reliquias[i]} completa!");
+            }
+        }
 
 
         if (intentos == 30)
