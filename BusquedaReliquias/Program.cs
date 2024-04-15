@@ -1,4 +1,86 @@
-﻿static char[,] inicializarTablero(int tamanioTablero)
+﻿static void mostrarPantallaInicial()
+{
+    Console.Clear();
+    Console.WriteLine(@"
+    ______     _ _             _                 _        _       
+    | ___ \   | (_)           (_)               | |      | |      
+    | |_/ /___| |_  __ _ _   _ _  __ _ ___    __| | ___  | | __ _ 
+    |    // _ \ | |/ _` | | | | |/ _` / __|  / _` |/ _ \ | |/ _` |
+    | |\ \  __/ | | (_| | |_| | | (_| \__ \ | (_| |  __/ | | (_| |
+    \_| \_\___|_|_|\__, |\__,_|_|\__,_|___/  \__,_|\___| |_|\__,_|
+                      | |                                         
+                      |_|                                         
+
+     _____ _       _ _ _               _               _____ _       _     _           _       
+    /  __ (_)     (_) (_)             (_)             |  _  | |     (_)   | |         | |      
+    | /  \/___   ___| |_ ______ _  ___ _  ___  _ __   | | | | |_   ___  __| | __ _  __| | __ _ 
+    | |   | \ \ / / | | |_  / _` |/ __| |/ _ \| '_ \  | | | | \ \ / / |/ _` |/ _` |/ _` |/ _` |
+    | \__/\ |\ V /| | | |/ / (_| | (__| | (_) | | | | \ \_/ / |\ V /| | (_| | (_| | (_| | (_| |
+     \____/_| \_/ |_|_|_/___\__,_|\___|_|\___/|_| |_|  \___/|_| \_/ |_|\__,_|\__,_|\__,_|\__,_|
+    ");
+
+
+    Console.WriteLine(@"
+    ¡BIENVENIDO AL JUEGO DE BUSQUEDA DE RELIQUIAS!
+    
+    En este juego te embarcarás en una aventura arqueológica para descubrir tesoros perdidos de una antigua civilización.
+
+    Tu misión es encontrar todas las reliquias ocultas en el tablero antes de que se agoten tus intentos. Utiliza las coordenadas
+    para explorar cada rincón y descubre los tesoros que aguardan bajo tierra.
+    
+
+
+    ¿TIENES LO NECESARIO PARA CONVERTIRTE EN UN VERDADERO BUSCADOR DE RELIQUIAS? 
+
+    Presiona Enter para comenzar tu búsqueda...
+    ");
+}
+
+
+static void mostrarTitulo()
+{
+    Console.WriteLine(@"  
+     ____  __ __  __    ___   __ __  ____ ____    ___     ____    ____    ____   ____ __    __   ___   __ __ __  ___   __ 
+     || )) || || (( \  // \\  || || ||    || \\  // \\    || \\  ||       || \\ ||    ||    ||  // \\  || || || // \\ (( \
+     ||=)  || ||  \\  ((   )) || || ||==  ||  )) ||=||    ||  )) ||==     ||_// ||==  ||    || ((   )) || || || ||=||  \\ 
+     ||_)) \\_// \_))  \\_/X| \\_// ||___ ||_//  || ||    ||_//  ||___    || \\ ||___ ||__| ||  \\_/X| \\_// || || || \_))
+    
+
+    ");
+}
+
+
+static void mostrarPantallaDeReliquias()
+{
+    mostrarTitulo();
+    Console.WriteLine(@"
+    Las 8 reliquias que debes encontrar son las siguientes: 
+
+    S - Amuleto del Sol
+    F - Sello del Faraón
+    ZZ - Brazalete de Serpientes
+    MM - Máscara Ceremonial
+    EEE - Cofre de Esmeraldas
+    RRRR - Cetro de los Reyes
+    BBBBB - Báculo de los Sabios
+
+    
+    REGLAS:
+    
+    Las reliquias pueden encontrarse de manera vertical u horizontal por el tablero.
+
+    Tendrás un total de 40 intentos para encontrar todas las reliquias antes de que acabe el juego.
+
+    Para ingresar una coordenada primero colocas la letra de fila y luego el número de columna.
+
+    
+
+    EMPEZAR...
+    ");
+}
+
+
+static char[,] inicializarTablero(int tamanioTablero)
 {
     char[,] tablero = new char[tamanioTablero, tamanioTablero];
     
@@ -330,15 +412,27 @@ static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, strin
 }
 
 
+static bool elJuegoHaTerminado(bool[] reliquiasEncontradas, int intentos, int maxIntentos)
+{
+    bool todasLasReliquiasEncontradas = true;
+    foreach (bool reliquiaEncontrada in reliquiasEncontradas)
+    {
+        if (!reliquiaEncontrada)
+        {
+            todasLasReliquiasEncontradas = false;
+            break;
+        }
+    }
 
-
+    return todasLasReliquiasEncontradas || intentos >= maxIntentos;
+}
 
 
 
 //PROGRAMA PRINCIPAL
 
 int tamanioTablero = 10;
-int maxIntentos = 30;
+int maxIntentos = 40;
 
 string[] reliquias = { "S", "F", "ZZ", "MM", "EEE", "PPP", "RRRR", "BBBBB" };
 
@@ -355,7 +449,6 @@ char[,] tableroVisible = inicializarTablero(tamanioTablero);
 
 posicionarReliquias(tableroOculto, reliquias, tamanioTablero);
 
-bool juegoTerminado = false;
 int intentos = 0;
 int puntaje = 0;
 
@@ -363,29 +456,44 @@ bool[,] coordenadasUtilizadas=new bool[tamanioTablero,tamanioTablero];
 bool nuevaReliquiaEncontrada = false;
 string ultimaReliquiaEncontrada = "";
 
-while (!juegoTerminado)
+mostrarPantallaInicial();
+Console.ReadKey();
+Console.Clear();
+
+mostrarPantallaDeReliquias();
+Console.ReadKey();
+Console.Clear();
+
+while (!elJuegoHaTerminado(reliquiasEncontradas, intentos, maxIntentos))
 {
+    Console.Clear();
+
+    mostrarTitulo();
+
     int intentosRestantes = maxIntentos - intentos;
-    Console.WriteLine($"\n\nTe quedan {intentosRestantes} intentos restantes.");
-    Console.WriteLine($"Llevas {puntaje} puntos.");
 
+    Console.WriteLine("RELIQUIAS: S, F, ZZ, MM, EEE, PPP, RRRR, BBBBB");
 
+    Console.ForegroundColor = ConsoleColor.Red;
+    Console.WriteLine($"\nTiros restantes: {intentosRestantes}");
+    Console.WriteLine($"Puntaje: {puntaje} puntos");
 
-    Console.WriteLine("\n\nTablero oculto");
-    for (int i = 0; i < tamanioTablero; i++)
+    Console.Write($"\nReliquias encontradas: ");
+
+    for (int i = 0; i < reliquias.Length; i++)
     {
-        for (int j = 0; j < tamanioTablero; j++)
+        if (reliquiasEncontradas[i] == true)
         {
-            Console.Write("{0,3}", tableroOculto[i, j]);
+            Console.Write(reliquias[i]+"  ");
         }
-        Console.WriteLine();
     }
 
-
+    Console.WriteLine("\n");
+    Console.ResetColor();
 
     mostrarTablero(tableroVisible, tamanioTablero);
 
-    Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
+    Console.WriteLine("\n\nIngresa la coordenada donde sospechas que se esconde una reliquia (ej. A0):");
     string coordenada = Console.ReadLine();
 
     if (validarCoordenada(coordenada) == true)
@@ -395,7 +503,8 @@ while (!juegoTerminado)
 
         if (coordenadasUtilizadas[convertirFila(fila), columna] == true)
         {
-            Console.WriteLine("Coordenada ya utilizada intente de nuevo.");
+            Console.WriteLine("¡Oops! Parece que ya has investigado esa zona. Inténta con otra coordenada.");
+            Console.ReadKey();
             continue;
         }
 
@@ -408,44 +517,77 @@ while (!juegoTerminado)
 
         if (nuevaReliquiaEncontrada)
         {
-            Console.WriteLine($"¡Has encontrado la reliquia {ultimaReliquiaEncontrada} completa!");
-            nuevaReliquiaEncontrada = false;
-        }
+            Console.Clear();
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine(@"
+          _   _   _   _   _   _   _   _       _   _   _   _   _   _   _   _   _   _  
+         / \ / \ / \ / \ / \ / \ / \ / \     / \ / \ / \ / \ / \ / \ / \ / \ / \ / \ 
+        ( R | E | L | I | Q | U | I | A )   ( E | N | C | O | N | T | R | A | D | A )
+         \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/     \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ \_/ 
+            
 
-        if (intentos == 30)
-        {
-            juegoTerminado = true;
-            Console.WriteLine("¡Has encontrado todas las reliquias! ¡Felicidades!");
+            ");
+            Console.ResetColor();
+
+            mostrarTablero(tableroVisible, tamanioTablero);
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine("\n\n¡FELICIDADES!");
+            Console.WriteLine($"¡Has encontrado la reliquia {ultimaReliquiaEncontrada}!");
+            Console.ResetColor();
+            Console.WriteLine("\n\nPresiona Enter para seguir explorando...");
+
+            nuevaReliquiaEncontrada = false;
+            Console.ReadKey();
         }
     }
     else
     {
-        Console.WriteLine("Coordenada inválida. Inténtelo de nuevo.");
+        Console.WriteLine("Lo siento, parece que la coordenada que has ingresado no es válida. Por favor, intenta de nuevo.");
+        Console.ReadKey();
     }
 }
 
+Console.Clear();
 
+if (intentos >= maxIntentos)
+{
+    Console.WriteLine(@"
+      ____  __ __    ___   ____   ___       ______    ___  ____   ___ ___  ____  ____    ____  ___     ___  
+     |    ||  |  |  /  _] /    | /   \     |      |  /  _]|    \ |   |   ||    ||    \  /    ||   \   /   \ 
+     |__  ||  |  | /  [_ |   __||     |    |      | /  [_ |  D  )| _   _ | |  | |  _  ||  o  ||    \ |     |
+     __|  ||  |  ||    _]|  |  ||  O  |    |_|  |_||    _]|    / |  \_/  | |  | |  |  ||     ||  D  ||  O  |
+    /  |  ||  :  ||   [_ |  |_ ||     |      |  |  |   [_ |    \ |   |   | |  | |  |  ||  _  ||     ||     |
+    \  `  ||     ||     ||     ||     |      |  |  |     ||  .  \|   |   | |  | |  |  ||  |  ||     ||     |
+     \____j \__,_||_____||___,_| \___/       |__|  |_____||__|\_||___|___||____||__|__||__|__||_____| \___/ 
+                                                                                                        
+    ");
+    
+    mostrarTablero(tableroVisible, tamanioTablero);
+    Console.WriteLine("\n\n¡HAS AGOTADO TODOS TUS INTENTOS!");
+    Console.WriteLine($"Acumulaste {puntaje} puntos en el juego.");
+    Console.WriteLine("\n¡GRACIAS POR JUGAR! ¡Te esperamos para nuevas exploraciones en el futuro! ");
+    Console.WriteLine("Presiona Enter para salir...");
+    Console.ReadKey();
+}
+else
+{
 
+    Console.WriteLine(@"
+     _____  ___  _      ____   __  ____  ___     ____  ___      ___  _____ __ 
+    |     |/  _]| |    |    | /  ]|    ||   \   /    ||   \    /  _]/ ___/|  |
+    |   __/  [_ | |     |  | /  /  |  | |    \ |  o  ||    \  /  [_(   \_ |  |
+    |  |_|    _]| |___  |  |/  /   |  | |  D  ||     ||  D  ||    _]\__  ||__|
+    |   _]   [_ |     | |  /   \_  |  | |     ||  _  ||     ||   [_ /  \ | __ 
+    |  | |     ||     | |  \     | |  | |     ||  |  ||     ||     |\    ||  |
+    |__| |_____||_____||____\____||____||_____||__|__||_____||_____| \___||__|
+    
+    ");
 
-
-
-
-//Console.WriteLine("\n\nTablero oculto");
-//for (int i = 0; i < tamanioTablero; i++)
-//{
-//    for (int j = 0; j < tamanioTablero; j++)
-//    {
-//        Console.Write("{0,3}", tableroOculto[i, j]);
-//    }
-//    Console.WriteLine();
-//}
-
-//Console.WriteLine("\n\nTablero visible");
-//for (int i = 0; i < tamanioTablero; i++)
-//{
-//    for (int j = 0; j < tamanioTablero; j++)
-//    {
-//        Console.Write("{0,3}", tableroVisible[i, j]);
-//    }
-//    Console.WriteLine();
-//}
+    mostrarTablero(tableroVisible, tamanioTablero);
+    Console.WriteLine("\n\n¡GANASTE EL JUEGO!");
+    Console.WriteLine($"¡Has encontrado todas las reliquias y completado la búsqueda en {intentos} intentos!");
+    Console.WriteLine($"Alcanzaste el puntaje completo de {puntaje} puntos.");
+    Console.WriteLine("\n¡GRACIAS POR JUGAR! ¡Te esperamos para nuevas exploraciones en el futuro! ");
+    Console.WriteLine("Presiona Enter para salir...");
+    Console.ReadKey();
+}
