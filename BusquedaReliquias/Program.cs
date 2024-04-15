@@ -249,41 +249,82 @@ static void acumularPartesDeReliquias(char simbolo, int[] conteoReliquiasEncontr
 }
 
 
-static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, bool[] reliquiasEncontradas)
+static int puntajePorReliquia(string reliquia)
 {
-    if (conteoReliquiasEncontradas[0] == 1) //S
+    switch (reliquia.Length)
+    {
+        case 1:
+            return 5;
+        case 2:
+            return 10;
+        case 3:
+            return 20;
+        case 4:
+            return 35;
+        case 5:
+            return 45;
+    }
+
+    return 0;
+}
+
+
+static void marcarReliquiaComoEncontrada(int[] conteoReliquiasEncontradas, string[] reliquias, bool[] reliquiasEncontradas, ref int puntaje, ref bool nuevaReliquiaEncontrada)
+{
+    if (!reliquiasEncontradas[0] && conteoReliquiasEncontradas[0] == 1) //S
     {
         reliquiasEncontradas[0] = true;
+        puntaje += puntajePorReliquia(reliquias[0]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[1] == 1) //F
+    else if (!reliquiasEncontradas[1] && conteoReliquiasEncontradas[1] == 1) //F
     {
         reliquiasEncontradas[1] = true;
+        puntaje += puntajePorReliquia(reliquias[1]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[2] == 2) //ZZ
+    else if (!reliquiasEncontradas[2] && conteoReliquiasEncontradas[2] == 2) //ZZ
     {
         reliquiasEncontradas[2] = true;
+        puntaje += puntajePorReliquia(reliquias[2]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[3] == 2) //MM
+    else if (!reliquiasEncontradas[3] && conteoReliquiasEncontradas[3] == 2) //MM
     {
         reliquiasEncontradas[3] = true;
+        puntaje += puntajePorReliquia(reliquias[3]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[4] == 3) //EEE
+    else if (!reliquiasEncontradas[4] && conteoReliquiasEncontradas[4] == 3) //EEE
     {
         reliquiasEncontradas[4] = true;
+        puntaje += puntajePorReliquia(reliquias[4]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[5] == 3) //PPP
+    else if (!reliquiasEncontradas[5] && conteoReliquiasEncontradas[5] == 3) //PPP
     {
         reliquiasEncontradas[5] = true;
+        puntaje += puntajePorReliquia(reliquias[5]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[6] == 4) //RRRR
+    else if (!reliquiasEncontradas[6] && conteoReliquiasEncontradas[6] == 4) //RRRR
     {
         reliquiasEncontradas[6] = true;
+        puntaje += puntajePorReliquia(reliquias[6]);
+        nuevaReliquiaEncontrada = true;
     }
-    else if (conteoReliquiasEncontradas[7] == 5) //BBBBB
+    else if (!reliquiasEncontradas[7] && conteoReliquiasEncontradas[7] == 5) //BBBBB
     {
         reliquiasEncontradas[7] = true;
+        puntaje += puntajePorReliquia(reliquias[7]);
+        nuevaReliquiaEncontrada = true;
     }
 }
+
+
+
+
+
 
 
 //PROGRAMA PRINCIPAL
@@ -310,7 +351,9 @@ bool juegoTerminado = false;
 int intentos = 0;
 int puntaje = 0;
 
-bool[,] coordenadasUtilizadas=new bool[tamanioTablero,tamanioTablero]; 
+bool[,] coordenadasUtilizadas=new bool[tamanioTablero,tamanioTablero];
+bool nuevaReliquiaEncontrada = false;
+string ultimaReliquiaEncontrada = "";
 
 while (!juegoTerminado)
 {
@@ -318,7 +361,7 @@ while (!juegoTerminado)
     Console.WriteLine($"\n\nTe quedan {intentosRestantes} intentos restantes.");
     Console.WriteLine($"Llevas {puntaje} puntos.");
 
-    mostrarTablero(tableroVisible, tamanioTablero);
+
 
     Console.WriteLine("\n\nTablero oculto");
     for (int i = 0; i < tamanioTablero; i++)
@@ -330,6 +373,9 @@ while (!juegoTerminado)
         Console.WriteLine();
     }
 
+
+
+    mostrarTablero(tableroVisible, tamanioTablero);
 
     Console.WriteLine("\n\nIngresa una coordenada para atacar (ej. A0):");
     string coordenada = Console.ReadLine();
@@ -350,16 +396,20 @@ while (!juegoTerminado)
 
         intentos++;
 
-        marcarReliquiaComoEncontrada(conteoReliquiasEncontradas, reliquiasEncontradas);
+        marcarReliquiaComoEncontrada(conteoReliquiasEncontradas, reliquias, reliquiasEncontradas, ref puntaje, ref nuevaReliquiaEncontrada);
 
-        for (int i = 0; i < reliquias.Length; i++)
+        if (nuevaReliquiaEncontrada)
         {
-            if (reliquiasEncontradas[i] == true)
+            for (int i = 0; i < reliquias.Length; i++)
             {
-                Console.WriteLine($"¡Has encontrado la reliquia {reliquias[i]} completa!");
+                if (reliquiasEncontradas[i] == true)
+                {
+                    Console.WriteLine($"¡Has encontrado la reliquia {reliquias[i]} completa!");
+                }
             }
-        }
 
+            nuevaReliquiaEncontrada = false;
+        }
 
         if (intentos == 30)
         {
